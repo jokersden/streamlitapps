@@ -53,7 +53,6 @@ selected_token = st.sidebar.multiselect(
     (tfx.TOKEN.unique()),
     (tfx.TOKEN.unique()),
 )
-# st.sidebar.d
 st.sidebar.text("Please pick a date range: (YY/MM/DD)")
 slider_start = st.sidebar.slider(
     "Start date:",
