@@ -16,9 +16,7 @@ st.title("Osmosis Stablecoin dominance")
 
 hide_st_style = """
             <style>
-            #MainMenu {visibility: hidden;}
             footer {visibility: hidden;}
-            header {visibility: hidden;}
             </style>
             """
 st.markdown(hide_st_style, unsafe_allow_html=True)
@@ -135,6 +133,19 @@ fig_all_tfx = px.bar(
 
 st.plotly_chart(fig_all_tfx, use_container_width=True)
 
+fig_all_tfx = px.bar(
+    tfx_vis[["DATE", "TOKEN", "Senders"]],
+    x="DATE",
+    y="Senders",
+    color="TOKEN",
+    labels={"DATE": "Date", "TOKEN": "Coin name", "Senders": "Users"},
+    title="Number of users who transferred",
+    template="plotly_dark",
+)
+
+
+st.plotly_chart(fig_all_tfx, use_container_width=True)
+
 st.text(
     f"Dominant stablecoin in transfers during {slider_start.date().strftime('%Y-%B-%d')} to {slider_end.date().strftime('%Y-%B-%d')}"
 )
@@ -171,6 +182,25 @@ fig_ibc_tfx = px.bar(
 
 st.plotly_chart(fig_ibc_tfx, use_container_width=True)
 
+fig_ibc_tfx = go.Figure()
+
+fig_ibc_tfx = px.bar(
+    tfx_vis[["DATE", "TOKEN", "Senders"]],
+    x="DATE",
+    y="Senders",
+    color="TOKEN",
+    labels={
+        "DATE": "Date",
+        "TOKEN": "Coin name",
+        "Senders": "Users",
+    },
+    title="Number of senders who transferred out of IBC",
+    template="plotly_dark",
+)
+
+
+st.plotly_chart(fig_ibc_tfx, use_container_width=True)
+
 st.text(
     f"Dominant stablecoin in IBC transfer(out) during {slider_start.date().strftime('%Y-%B-%d')} to {slider_end.date().strftime('%Y-%B-%d')}"
 )
@@ -200,6 +230,20 @@ fig_from_swaps = px.bar(
     template="plotly_dark",
 )
 
+st.plotly_chart(fig_from_swaps, use_container_width=True)
+
+fig_from_swaps = go.Figure()
+
+fig_from_swaps = px.bar(
+    from_swap_vis[["DATE", "FROM_TOKEN", "FROM_SWAPPERS"]],
+    x="DATE",
+    y="FROM_SWAPPERS",
+    color="FROM_TOKEN",
+    labels={"DATE": "Date", "FROM_SWAPPERS": "Swappers"},
+    title="Number of users who swapped their stables",
+    template="plotly_dark",
+)
+
 
 st.plotly_chart(fig_from_swaps, use_container_width=True)
 
@@ -213,6 +257,22 @@ fig_to_swaps = px.bar(
     color="TO_TOKEN",
     labels={"DATE": "Date"},
     title="Swaps TO stablecoins from other coins",
+    template="plotly_dark",
+)
+
+
+st.plotly_chart(fig_to_swaps, use_container_width=True)
+
+
+fig_to_swaps = go.Figure()
+
+fig_to_swaps = px.bar(
+    to_swap_vis[["DATE", "TO_TOKEN", "TO_SWAPPERS"]],
+    x="DATE",
+    y="TO_SWAPPERS",
+    color="TO_TOKEN",
+    labels={"DATE": "Date", "TO_SWAPPERS": "Swappers"},
+    title="Number of swappers who swap to stables",
     template="plotly_dark",
 )
 
