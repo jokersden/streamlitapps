@@ -1,6 +1,5 @@
 from datetime import date, datetime
 import os
-from tkinter import N
 import pandas as pd
 import streamlit as st
 import requests
