@@ -76,7 +76,7 @@ hide_st_style = """
 st.markdown(hide_st_style, unsafe_allow_html=True)
 
 
-@st.cache(allow_output_mutation=True, show_spinner=False, ttl=600)
+# @st.cache(allow_output_mutation=True, show_spinner=False, ttl=600)
 def get_data(sql_query):
     query = create_query(sql_query)
     token = query.get("token")
@@ -166,6 +166,7 @@ nft_mints_by_hour = (
 
 col1, col2, col3, col4, col5 = st.columns(5)
 
+nft_mint_df = nft_mint_df.drop_duplicates("TOKENID")
 col1.metric(
     label="Number of ShroomDKs minted",
     value=len(nft_mint_df.TOKENID),
@@ -294,3 +295,22 @@ fig.add_trace(
 fig.update_xaxes(title="Time")
 fig.update_yaxes(title="Number of mints")
 col2_ch2.plotly_chart(fig, use_container_width=True)
+
+tx_fees_df = (
+    tx_fail_df.groupby([tx_fail_df.BLOCK_TIMESTAMP.dt.floor("h"), "CHAIN"])
+    .count()["TO_ADDRESS"]
+    .reset_index()
+)
+
+fig_fees = go.Figure()
+fig_fees = px.bar(
+    tx_fees_df,
+    x="BLOCK_TIMESTAMP",
+    y="TO_ADDRESS",
+    color="CHAIN",
+    title="Number of failed transactions overtime",
+    labels=dict(BLOCK_TIMESTAMP="Time", TO_ADDRESS="Failed txs"),
+)
+fig.update_xaxes(title="Time")
+fig.update_yaxes(title="Number of failed txs", selector=False)
+st.plotly_chart(fig_fees, use_container_width=True)
