@@ -42,6 +42,10 @@ def get_query_results(token):
             "x-api-key": API_KEY,
         },
     )
+    if r.status_code == 504:
+        time.sleep(10)
+        return get_query_results(token)
+
     if r.status_code != 200:
         raise Exception(
             "Error getting query results, got response: "
