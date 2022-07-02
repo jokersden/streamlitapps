@@ -78,7 +78,7 @@ hide_st_style = """
 st.markdown(hide_st_style, unsafe_allow_html=True)
 
 
-@st.cache(allow_output_mutation=True, show_spinner=False, ttl=None)
+@st.cache(allow_output_mutation=True, show_spinner=False, ttl=600)
 def get_data(sql_query):
     query = create_query(sql_query)
     token = query.get("token")
@@ -150,7 +150,9 @@ nft_raw_god_df = nft_raw_god_df.sort_values(by="BLOCK_TIMESTAMP")
 nft_god_df = nft_raw_god_df.drop_duplicates("TOKENID", keep="last").reset_index(
     drop=True
 )
-nft_god_df = nft_god_df[nft_god_df.NFT_TO_ADDRESS.isin(shroom_hdlers_df.NFT_TO_ADDRESS)]
+nft_god_df = shroom_hdlers_df[
+    shroom_hdlers_df.NFT_TO_ADDRESS.isin(nft_god_df.NFT_TO_ADDRESS)
+]
 
 nft_mints_by_the_hour = (
     nft_mint_df.groupby(nft_mint_df.BLOCK_TIMESTAMP.dt.hour)
@@ -223,6 +225,12 @@ col_chart2.plotly_chart(
     ),
     use_container_width=True,
 )
+nft_minter_df = (
+    nft_mint_df.drop_duplicates("NFT_TO_ADDRESS")
+    .groupby(nft_mint_df["BLOCK_TIMESTAMP"].dt.floor("h"))
+    .count()["TOKENID"]
+    .reset_index()
+)
 
 fig = go.Figure()
 fig = px.bar(
@@ -230,8 +238,18 @@ fig = px.bar(
     x="BLOCK_TIMESTAMP",
     y="TOKENID",
     template="plotly_dark",
-    labels=dict(BLOCK_TIMESTAMP="DateTime", TOKENID="Mints"),
-    title="Number of Mints happened overtime",
+    labels=dict(
+        BLOCK_TIMESTAMP="DateTime",
+        TOKENID="Mints",
+    ),
+    title="Number of Mints and New minters overtime",
+)
+fig.add_trace(
+    go.Scatter(
+        x=nft_minter_df.BLOCK_TIMESTAMP,
+        y=nft_minter_df.TOKENID,
+        name="Number of new minters",
+    )
 )
 fig.update_xaxes(title="Time")
 fig.update_yaxes(title="Number of mints")
@@ -252,3 +270,29 @@ fig = px.area(
 fig.update_xaxes(title="Hour of the day")
 fig.update_yaxes(title="Number of mints")
 col1_ch2.plotly_chart(fig, use_container_width=True)
+
+fig = go.Figure()
+fig = px.line(
+    nft_god_df.drop_duplicates("NFT_TO_ADDRESS")
+    .groupby(nft_god_df["BLOCK_TIMESTAMP"].dt.floor("h"))
+    .count()["TOKENID"]
+    .reset_index(),
+    x="BLOCK_TIMESTAMP",
+    y="TOKENID",
+    template="plotly_dark",
+    labels=dict(
+        BLOCK_TIMESTAMP="DateTime",
+        TOKENID="Mints",
+    ),
+    title="Number of New minters and minters HODLing God Mode",
+)
+fig.add_trace(
+    go.Bar(
+        x=nft_minter_df.BLOCK_TIMESTAMP,
+        y=nft_minter_df.TOKENID,
+        name="Number of new minters",
+    )
+)
+fig.update_xaxes(title="Time")
+fig.update_yaxes(title="Number of mints")
+col2_ch2.plotly_chart(fig, use_container_width=True)
