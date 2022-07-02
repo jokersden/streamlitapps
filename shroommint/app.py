@@ -7,7 +7,6 @@ import requests
 import json
 import time
 
-from streamlit_echarts import st_echarts
 import plotly.express as px
 import plotly.graph_objects as go
 
