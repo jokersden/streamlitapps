@@ -32,7 +32,7 @@ hide_st_style = """
             header {visibility: hidden;}
             </style>
             """
-# st.markdown(hide_st_style, unsafe_allow_html=True)
+st.markdown(hide_st_style, unsafe_allow_html=True)
 
 sdk = ShroomDK(API_KEY)
 
@@ -380,11 +380,65 @@ fig_miner_dist = px.box(
 fig_miner_dist.update_xaxes(title="Mined block size category")
 fig_miner_dist.update_yaxes(title="Percentage (%)")
 st.plotly_chart(fig_miner_dist, use_container_width=True)
-st.info("This chart shows that how different miners interested in mining blocks with different transaction counts, for example there is ONLY 1 miner who has mined 92.3% of their blocks with 500+ transactions."
-" While there are miners who have 100% of their mined blocks had less than 10 transactions, but as we saw the transactions per block increased significantly since 2020, we see that miners who mined less than 10 transaction block reduced dramatically")
-fig_10orless = px.histogram(miner_categories, x="10 or less transactions %", title="")
+st.info(
+    "This chart shows that how different miners interested in mining blocks with different transaction counts, for example there is ONLY 1 miner who has mined 92.3% of their blocks with 500+ transactions."
+    " While there are miners who have 100% of their mined blocks had less than 10 transactions, but as we saw the transactions per block increased significantly since 2020, we see that miners who mined less than 10 transaction block reduced dramatically"
+)
+
+fig_10orless = px.histogram(
+    miner_categories,
+    x="10 or less transactions %",
+    title="Do miners mine only smaller blocks",
+)
 fig_10orless.update_yaxes(title="Miners")
-st.plotly_chart(fig_10orless, use_container_width=True)
-st.warning("So miners have mined block with larger transaction counts recently")
+cat1, cat2 = st.columns(2)
+cat1.plotly_chart(fig_10orless, use_container_width=True)
+
+fig_500more = px.histogram(
+    miner_categories,
+    x="more than 500 transactions %",
+    title="Or what percentage of larger blocks do miners mine",
+)
+fig_500more.update_yaxes(title="Miners")
+cat2.plotly_chart(fig_500more, use_container_width=True)
+st.info(
+    "Looking at the smallest and largest block mines, we see that since 2020 only 9 miners had mined 90%+ of their blocks with less than 10 transactions"
+    " while there are only 2 miners having more than 50% of their mined blocks with 500 or more transcations."
+)
+
+st.subheader(
+    "Miners with 50%+ of their mined blocks which having more than 500 transactions in each block"
+)
+st.write(
+    f"Here are the {len(miner_categories[miner_categories['more than 500 transactions %'] >= 50])} miners"
+)
+st.dataframe(
+    miner_categories[
+        miner_categories["more than 500 transactions %"] >= 50
+    ].reset_index(drop=True)
+)
+
+st.subheader(
+    "Miners with 90%+ of their mined blocks which having less than 60 transactions in each block"
+)
+st.write(
+    f"Here are the {len(miner_categories[miner_categories['10 or less transactions %'] >= 90])} miners"
+)
+st.dataframe(
+    miner_categories[miner_categories["10 or less transactions %"] >= 90].reset_index(
+        drop=True
+    )
+)
+st.subheader("")
+
+st.warning(
+    "To conclude, there's no general pattern where miners are either trying to mine only relatively large blocks or small blocks."
+    " due to the fact that early days of Ethereum having blocks with smaller number of transactions we saw that many have higher percentage of "
+    "mined blocks with smaller amount of transactions but with the cxplosion of number of transactions mined in a block since "
+    "2020 we don't see any particular tendency of miners for either go for bigger or smaller blocks in terms of transaction counts. However, we found fe anomalies "
+    "where 2 users had significantly higher 50%+ (and one with 90%+) of their mined blocks having 500 or more transactions and there are also 9 miners since 2020 with 90%+ of the their mined blocks containing less than 10 transactions."
+)
 with st.expander("Resources"):
-    st.markdown("test")
+    st.markdown(
+        "Following velocity page has the queries used in this analysis: https://app.flipsidecrypto.com/velocity/queries/19b75d3b-aeec-4a7b-903b-2b560907a7ef"
+    )
