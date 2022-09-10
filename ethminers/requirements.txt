@@ -2,3 +2,4 @@ shroomdk
 pandas
 numpy
 streamlit
+plotly
